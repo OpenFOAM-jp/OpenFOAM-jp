@@ -218,18 +218,21 @@ void Foam::cyclicACMIFvPatchField<Type>::updateInterfaceMatrix
 (
     solveScalarField& result,
     const bool add,
+    const lduAddressing& lduAddr,
+    const label patchId,
     const solveScalarField& psiInternal,
     const scalarField& coeffs,
     const direction cmpt,
     const Pstream::commsTypes
 ) const
 {
-    const cyclicACMIPolyPatch& cpp = cyclicACMIPatch_.cyclicACMIPatch();
-
     // note: only applying coupled contribution
 
     const labelUList& nbrFaceCellsCoupled =
-        cpp.neighbPatch().faceCells();
+        lduAddr.patchAddr
+        (
+            cyclicACMIPatch_.cyclicACMIPatch().neighbPatchID()
+        );
 
     solveScalarField pnf(psiInternal, nbrFaceCellsCoupled);
 
@@ -238,7 +241,9 @@ void Foam::cyclicACMIFvPatchField<Type>::updateInterfaceMatrix
 
     pnf = cyclicACMIPatch_.interpolate(pnf);
 
-    this->addToInternalField(result, !add, coeffs, pnf);
+    const labelUList& faceCells = lduAddr.patchAddr(patchId);
+
+    this->addToInternalField(result, !add, faceCells, coeffs, pnf);
 }
 
 
@@ -247,16 +252,20 @@ void Foam::cyclicACMIFvPatchField<Type>::updateInterfaceMatrix
 (
     Field<Type>& result,
     const bool add,
+    const lduAddressing& lduAddr,
+    const label patchId,
     const Field<Type>& psiInternal,
     const scalarField& coeffs,
     const Pstream::commsTypes
 ) const
 {
-    const cyclicACMIPolyPatch& cpp = cyclicACMIPatch_.cyclicACMIPatch();
-
     // note: only applying coupled contribution
 
-    const labelUList& nbrFaceCellsCoupled = cpp.neighbPatch().faceCells();
+    const labelUList& nbrFaceCellsCoupled =
+        lduAddr.patchAddr
+        (
+            cyclicACMIPatch_.cyclicACMIPatch().neighbPatchID()
+        );
 
     Field<Type> pnf(psiInternal, nbrFaceCellsCoupled);
 
@@ -265,7 +274,9 @@ void Foam::cyclicACMIFvPatchField<Type>::updateInterfaceMatrix
 
     pnf = cyclicACMIPatch_.interpolate(pnf);
 
-    this->addToInternalField(result, !add, coeffs, pnf);
+    const labelUList& faceCells = lduAddr.patchAddr(patchId);
+
+    this->addToInternalField(result, !add, faceCells, coeffs, pnf);
 }
 
 

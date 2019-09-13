@@ -54,6 +54,8 @@ void Foam::lduMatrix::initMatrixInterfaces
                 (
                     result,
                     add,
+                    lduMesh_.lduAddr(),
+                    interfacei,
                     psiif,
                     coupleCoeffs[interfacei],
                     cmpt,
@@ -81,6 +83,8 @@ void Foam::lduMatrix::initMatrixInterfaces
                 (
                     result,
                     add,
+                    lduMesh_.lduAddr(),
+                    interfacei,
                     psiif,
                     coupleCoeffs[interfacei],
                     cmpt,
@@ -119,6 +123,8 @@ void Foam::lduMatrix::updateMatrixInterfaces
                 (
                     result,
                     add,
+                    lduMesh_.lduAddr(),
+                    interfacei,
                     psiif,
                     coupleCoeffs[interfacei],
                     cmpt,
@@ -148,6 +154,8 @@ void Foam::lduMatrix::updateMatrixInterfaces
                             (
                                 result,
                                 add,
+                                lduMesh_.lduAddr(),
+                                interfacei,
                                 psiif,
                                 coupleCoeffs[interfacei],
                                 cmpt,
@@ -200,6 +208,8 @@ void Foam::lduMatrix::updateMatrixInterfaces
                 (
                     result,
                     add,
+                    lduMesh_.lduAddr(),
+                    interfacei,
                     psiif,
                     coupleCoeffs[interfacei],
                     cmpt,
@@ -213,18 +223,20 @@ void Foam::lduMatrix::updateMatrixInterfaces
         const lduSchedule& patchSchedule = this->patchSchedule();
 
         // Loop over all the "normal" interfaces relating to standard patches
-        forAll(patchSchedule, i)
+        for (const auto& sched : patchSchedule)
         {
-            label interfacei = patchSchedule[i].patch;
+            const label interfacei = sched.patch;
 
             if (interfaces.set(interfacei))
             {
-                if (patchSchedule[i].init)
+                if (sched.init)
                 {
                     interfaces[interfacei].initInterfaceMatrixUpdate
                     (
                         result,
                         add,
+                        lduMesh_.lduAddr(),
+                        interfacei,
                         psiif,
                         coupleCoeffs[interfacei],
                         cmpt,
@@ -237,6 +249,8 @@ void Foam::lduMatrix::updateMatrixInterfaces
                     (
                         result,
                         add,
+                        lduMesh_.lduAddr(),
+                        interfacei,
                         psiif,
                         coupleCoeffs[interfacei],
                         cmpt,
@@ -261,6 +275,8 @@ void Foam::lduMatrix::updateMatrixInterfaces
                 (
                     result,
                     add,
+                    lduMesh_.lduAddr(),
+                    interfacei,
                     psiif,
                     coupleCoeffs[interfacei],
                     cmpt,

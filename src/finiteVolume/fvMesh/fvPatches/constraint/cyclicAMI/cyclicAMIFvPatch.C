@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2016 OpenFOAM Foundation
+    Copyright (C) 2019 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -164,6 +165,16 @@ Foam::tmp<Foam::labelField> Foam::cyclicAMIFvPatch::interfaceInternalField
 }
 
 
+Foam::tmp<Foam::labelField> Foam::cyclicAMIFvPatch::interfaceInternalField
+(
+    const labelUList& internalData,
+    const labelUList& faceCells
+) const
+{
+    return patchInternalField(internalData, faceCells);
+}
+
+
 Foam::tmp<Foam::labelField> Foam::cyclicAMIFvPatch::internalFieldTransfer
 (
     const Pstream::commsTypes commsType,
@@ -171,6 +182,17 @@ Foam::tmp<Foam::labelField> Foam::cyclicAMIFvPatch::internalFieldTransfer
 ) const
 {
     return neighbFvPatch().patchInternalField(iF);
+}
+
+
+Foam::tmp<Foam::labelField> Foam::cyclicAMIFvPatch::internalFieldTransfer
+(
+    const Pstream::commsTypes commsType,
+    const labelUList& iF,
+    const labelUList& nbrFaceCells
+) const
+{
+    return patchInternalField(iF, nbrFaceCells);
 }
 
 

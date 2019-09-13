@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2018 OpenFOAM Foundation
+    Copyright (C) 2019 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -240,6 +241,15 @@ public:
             //- Return given internal field next to patch as patch field
             template<class Type>
             tmp<Field<Type>> patchInternalField(const UList<Type>&) const;
+
+            //- Return given internal field next to patch as patch field
+            //- using faceCells mapping
+            template<class Type>
+            tmp<Field<Type>> patchInternalField
+            (
+                const UList<Type>&,
+                const labelUList& faceCells
+            ) const;
 
             //- Return given internal field next to patch as patch field
             template<class Type>

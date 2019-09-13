@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2013-2016 OpenFOAM Foundation
+    Copyright (C) 2019 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -168,9 +169,9 @@ public:
                 );
             }
 
-            //- Return true if this patch is coupled. This is equivalent
-            //  to the coupledPolyPatch::coupled() if parallel running or
-            //  both sides present, false otherwise
+            //- Return true if this patch is coupled.
+            //  This is equivalent to coupledPolyPatch::coupled()
+            //  if parallel running or both sides present, false otherwise
             virtual bool coupled() const;
 
             //- Return delta (P to N) vectors across coupled patch
@@ -206,10 +207,18 @@ public:
         // Interface transfer functions
 
             //- Return the values of the given internal data adjacent to
-            //  the interface as a field
+            //- the interface as a field
             virtual tmp<labelField> interfaceInternalField
             (
                 const labelUList& internalData
+            ) const;
+
+            //- Return the values of the given internal data adjacent to
+            //- the interface as a field using a mapping faceCell
+            virtual tmp<labelField> interfaceInternalField
+            (
+                const labelUList& internalData,
+                const labelUList& faceCells
             ) const;
 
             //- Return neighbour field
@@ -217,6 +226,14 @@ public:
             (
                 const Pstream::commsTypes commsType,
                 const labelUList& internalData
+            ) const;
+
+            //- Return neighbour field using nbrFaceCells mapping
+            virtual tmp<labelField> internalFieldTransfer
+            (
+                const Pstream::commsTypes commsType,
+                const labelUList& internalData,
+                const labelUList& nbrFaceCells
             ) const;
 };
 
