@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2015 OpenFOAM Foundation
+    Copyright (C) 2019 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -67,7 +68,7 @@ inline const Foam::word& Foam::mappedPatchBase::samplePatch() const
             FatalErrorInFunction
                 << "Supply either a patchName or a coupleGroup"
                 << " for patch " << patch_.name()
-                << " in region " << patch_.boundaryMesh().mesh().name()
+                << " in region " << patch_.boundaryMesh().mesh().name() << nl
                 << exit(FatalError);
         }
 
@@ -165,6 +166,12 @@ inline const Foam::AMIPatchToPatchInterpolation& Foam::mappedPatchBase::AMI
     }
 
     return *AMIPtr_;
+}
+
+
+inline bool Foam::mappedPatchBase::owner() const
+{
+    return (patch_.boundaryMesh().mesh().name() < sampleRegion());
 }
 
 

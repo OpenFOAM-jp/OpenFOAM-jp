@@ -6,6 +6,7 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011-2016 OpenFOAM Foundation
+    Copyright (C) 2019 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -143,7 +144,6 @@ public:
 
     class nearestEqOp
     {
-
     public:
 
         void operator()(nearInfo& x, const nearInfo& y) const
@@ -164,7 +164,6 @@ public:
 
     class maxProcEqOp
     {
-
     public:
 
         void operator()(nearInfo& x, const nearInfo& y) const
@@ -353,7 +352,7 @@ public:
     virtual ~mappedPatchBase();
 
 
-    // Member functions
+    // Member Functions
 
         void clearOut();
 
@@ -391,6 +390,9 @@ public:
             (
                 const bool forceUpdate = false
             ) const;
+
+            //- Is it owner
+            inline bool owner() const;
 
             //- Return a pointer to the AMI projection surface
             const autoPtr<Foam::searchableSurface>& surfPtr() const;

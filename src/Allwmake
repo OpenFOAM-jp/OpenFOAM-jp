@@ -53,6 +53,7 @@ wmake $targetType genericPatchFields
 wmake $targetType mesh/extrudeModel
 wmake $targetType dynamicMesh
 
+wmake $targetType regionCoupled
 wmake $targetType parallel/decompose/decompositionMethods
 
 # Make dummy decomposition methods (dummyThirdParty)
