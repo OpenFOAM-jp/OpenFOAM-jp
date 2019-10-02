@@ -83,6 +83,7 @@ SourceFiles
 #include "mixedFvPatchFields.H"
 #include "temperatureCoupledBase.H"
 #include "scalarField.H"
+#include "fvMatrixAssembly.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -185,13 +186,21 @@ public:
         }
 
 
-    // Member functions
+    // Member Functions
 
         //- Update the coefficients associated with the patch field
         virtual void updateCoeffs();
 
+        //- Manipulate fvMatrixAssembly
+        virtual void manipulateMatrix
+        (
+            fvMatrixAssembly& matrix,
+            const labelList& faceMap,
+            const label cellOffset
+        );
+
         //- Write
-        virtual void write(Ostream&) const;
+        virtual void write(Ostream& os) const;
 };
 
 
