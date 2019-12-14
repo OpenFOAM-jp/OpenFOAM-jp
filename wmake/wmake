@@ -73,6 +73,7 @@ options:
   -q | -queue       wmakeCollect all sub-directories, running Allwmake if present
   -k | -keep-going  Keep going even when errors occur (-non-stop)
   -debug            Define c++DBUG='-DFULLDEBUG -g -O0' as override
+  -user             Set FOAM_APPBIN/FOAM_LIBBIN to user locations
   -j                Compile using all local cores/hyperthreads
   -jN | -j N        Compile using N cores/hyperthreads
   -no-scheduler     Disable scheduled parallel compilation
@@ -147,6 +148,11 @@ do
             ;;
         -debug)
             optDebug="-DFULLDEBUG -g -O0"
+            ;;
+        -user)
+            [ -n "$FOAM_USER_APPBIN" ] && export FOAM_APPBIN="$FOAM_USER_APPBIN"
+            [ -n "$FOAM_USER_LIBBIN" ] && export FOAM_LIBBIN="$FOAM_USER_LIBBIN"
+            echo "Compiling with user locations" 1>&2
             ;;
         -show-api | -show-ext-so | \
         -show-compile-c   | -show-c   | -show-cflags   | -show-cflags-arch | \

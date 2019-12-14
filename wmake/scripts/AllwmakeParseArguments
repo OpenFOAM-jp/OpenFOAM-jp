@@ -54,7 +54,7 @@ USAGE
 # Parse the arguments and options
 #------------------------------------------------------------------------------
 
-unset fromWmake optDebug optLog optQueue
+unset fromWmake optDebug optUser optQueue optLog
 
 for arg in "$@"
 do
@@ -93,6 +93,10 @@ do
         optDebug="-debug"
         continue    # Permanently remove arg
         ;;
+    -user)
+        optUser="-user"
+        continue    # Permanently remove arg
+        ;;
     -q | -queue)
         optQueue="-queue"
         continue    # Permanently remove arg
@@ -116,12 +120,12 @@ if [ -z "$fromWmake" ]
 then
     if [ -z "$optLog" ]
     then
-        exec wmake -all $optQueue $*
+        exec wmake -all $optDebug $optUser $optQueue $*
         exit $? # Unneeded, but just in case something went wrong
     else
         echo "Logging wmake -all output to '$optLog'" 1>&2
         echo 1>&2
-        exec wmake -all $optDebug $optQueue $* 2>&1 | /usr/bin/tee $optLog
+        exec wmake -all $optDebug $optUser $optQueue $* 2>&1 | /usr/bin/tee $optLog
         # Need to cleanup after the tee
         rc=$? # Error code from tee (not wmake), but not entirely important
         echo "Done logging to '$optLog'" 1>&2
