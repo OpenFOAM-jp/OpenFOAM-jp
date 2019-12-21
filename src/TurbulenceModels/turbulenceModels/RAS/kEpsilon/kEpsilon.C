@@ -42,6 +42,7 @@ namespace RASModels
 template<class BasicTurbulenceModel>
 void kEpsilon<BasicTurbulenceModel>::correctNut()
 {
+    // (LS:Eq. 2.2-3)
     this->nut_ = Cmu_*sqr(k_)/epsilon_;
     this->nut_.correctBoundaryConditions();
     fv::options::New(this->mesh_).correct(this->nut_);
@@ -58,8 +59,7 @@ tmp<fvScalarMatrix> kEpsilon<BasicTurbulenceModel>::kSource() const
         new fvScalarMatrix
         (
             k_,
-            dimVolume*this->rho_.dimensions()*k_.dimensions()
-            /dimTime
+            dimVolume*this->rho_.dimensions()*k_.dimensions()/dimTime
         )
     );
 }
@@ -73,8 +73,7 @@ tmp<fvScalarMatrix> kEpsilon<BasicTurbulenceModel>::epsilonSource() const
         new fvScalarMatrix
         (
             epsilon_,
-            dimVolume*this->rho_.dimensions()*epsilon_.dimensions()
-            /dimTime
+            dimVolume*this->rho_.dimensions()*epsilon_.dimensions()/dimTime
         )
     );
 }
@@ -109,7 +108,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
 
     Cmu_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensioned<scalar>::getOrAddToDict
         (
             "Cmu",
             this->coeffDict_,
@@ -118,7 +117,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
     ),
     C1_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensioned<scalar>::getOrAddToDict
         (
             "C1",
             this->coeffDict_,
@@ -127,7 +126,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
     ),
     C2_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensioned<scalar>::getOrAddToDict
         (
             "C2",
             this->coeffDict_,
@@ -136,7 +135,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
     ),
     C3_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensioned<scalar>::getOrAddToDict
         (
             "C3",
             this->coeffDict_,
@@ -145,7 +144,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
     ),
     sigmak_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensioned<scalar>::getOrAddToDict
         (
             "sigmak",
             this->coeffDict_,
@@ -154,7 +153,7 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
     ),
     sigmaEps_
     (
-        dimensioned<scalar>::lookupOrAddToDict
+        dimensioned<scalar>::getOrAddToDict
         (
             "sigmaEps",
             this->coeffDict_,
@@ -187,6 +186,15 @@ kEpsilon<BasicTurbulenceModel>::kEpsilon
         this->mesh_
     )
 {
+    if (mag(sigmak_.value()) < VSMALL || mag(sigmaEps_.value()) < VSMALL)
+    {
+        FatalErrorInFunction
+            << "Non-zero values are required for the model constants:" << nl
+            << "sigmak = " << sigmak_ << nl
+            << "sigmaEps = " << sigmaEps_ << nl
+            << exit(FatalError);
+    }
+
     bound(k_, this->kMin_);
     bound(epsilon_, this->epsilonMin_);
 
@@ -226,7 +234,7 @@ void kEpsilon<BasicTurbulenceModel>::correct()
         return;
     }
 
-    // Local references
+    // Construct local convenience references
     const alphaField& alpha = this->alpha_;
     const rhoField& rho = this->rho_;
     const surfaceScalarField& alphaRhoPhi = this->alphaRhoPhi_;
@@ -239,21 +247,22 @@ void kEpsilon<BasicTurbulenceModel>::correct()
 
     const volScalarField::Internal divU
     (
-        fvc::div(fvc::absolute(this->phi(), U))().v()
+        fvc::div(fvc::absolute(this->phi(), U))
     );
 
-    tmp<volTensorField> tgradU = fvc::grad(U);
+    const tmp<volTensorField> tgradU(fvc::grad(U));
     const volScalarField::Internal GbyNu
     (
-        tgradU().v() && dev(twoSymm(tgradU().v()))
+        dev(twoSymm(tgradU().v())) && tgradU().v()
     );
-    const volScalarField::Internal G(this->GName(), nut()*GbyNu);
     tgradU.clear();
+    const volScalarField::Internal G(this->GName(), nut()*GbyNu);
+
 
     // Update epsilon and G at the wall
     epsilon_.boundaryFieldRef().updateCoeffs();
 
-    // Dissipation equation
+    // Turbulent kinetic energy dissipation rate equation (LS:Eq. Eq. 2.2-1)
     tmp<fvScalarMatrix> epsEqn
     (
         fvm::ddt(alpha, rho, epsilon_)
@@ -274,7 +283,7 @@ void kEpsilon<BasicTurbulenceModel>::correct()
     fvOptions.correct(epsilon_);
     bound(epsilon_, this->epsilonMin_);
 
-    // Turbulent kinetic energy equation
+    // Turbulent kinetic energy equation (LS:Eq. 2.2-2)
     tmp<fvScalarMatrix> kEqn
     (
         fvm::ddt(alpha, rho, k_)

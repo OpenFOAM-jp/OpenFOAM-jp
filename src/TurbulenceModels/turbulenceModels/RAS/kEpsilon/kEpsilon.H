@@ -31,34 +31,40 @@ Group
     grpRASTurbulence
 
 Description
-    Standard k-epsilon turbulence model for incompressible and compressible
-    flows including rapid distortion theory (RDT) based compression term.
+    Standard k-epsilon turbulence closure model (two-transport equation, linear
+    eddy viscosity assumption) for incompressible and compressible flows
+    including rapid distortion theory (RDT) based compression term.
+
+    \heading Input fields
+    \plaintable
+        k        | Turbulent kinetic energy [m2/s2]
+        epsilon  | Turbulent kinetic energy dissipation rate [m2/s3]
+    \endplaintable
 
     Reference:
     \verbatim
-        Standard model:
-            Launder, B. E., & Spalding, D. B. (1972).
-            Lectures in mathematical models of turbulence.
-
+        Standard model (tag:LS):
             Launder, B. E., & Spalding, D. B. (1974).
             The numerical computation of turbulent flows.
             Computer methods in applied mechanics and engineering,
             3(2), 269-289.
+            DOI:10.1016/0045-7825(74)90029-2
 
         For the RDT-based compression term:
             El Tahry, S. H. (1983).
             k-epsilon equation for compressible reciprocating engine flows.
             Journal of Energy, 7(4), 345-353.
+            DOI:10.2514/3.48086
     \endverbatim
 
-    The default model coefficients are
+    The default model coefficients are (LS:Table 2.1):
     \verbatim
         kEpsilonCoeffs
         {
             Cmu         0.09;
             C1          1.44;
             C2          1.92;
-            C3          -0.33;
+            C3          -0.33;    // compression term coefficient
             sigmak      1.0;
             sigmaEps    1.3;
         }
@@ -102,7 +108,7 @@ class kEpsilon
 
 protected:
 
-    // Protected data
+    // Protected Data
 
         // Model coefficients
 
@@ -115,14 +121,20 @@ protected:
 
         // Fields
 
+            //- Turbulent kinetic energy [m2/s2]
             volScalarField k_;
+
+            //- Turbulent kinetic energy dissipation rate [m2/s3]
             volScalarField epsilon_;
 
 
     // Protected Member Functions
 
+        //- Update nut with the latest available k, and epsilon
         virtual void correctNut();
+
         virtual tmp<fvScalarMatrix> kSource() const;
+
         virtual tmp<fvScalarMatrix> epsilonSource() const;
 
 
@@ -188,19 +200,19 @@ public:
             );
         }
 
-        //- Return the turbulence kinetic energy
+        //- Return the turbulent kinetic energy field
         virtual tmp<volScalarField> k() const
         {
             return k_;
         }
 
-        //- Return the turbulence kinetic energy dissipation rate
+        //- Return the turbulent kinetic energy dissipation rate field
         virtual tmp<volScalarField> epsilon() const
         {
             return epsilon_;
         }
 
-        //- Solve the turbulence equations and correct the turbulence viscosity
+        //- Solve the turbulence equations and correct the turbulent viscosity
         virtual void correct();
 };
 
