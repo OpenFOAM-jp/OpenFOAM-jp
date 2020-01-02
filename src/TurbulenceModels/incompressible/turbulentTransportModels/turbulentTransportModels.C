@@ -67,9 +67,6 @@ makeRASModel(RNGkEpsilon);
 #include "realizableKE.H"
 makeRASModel(realizableKE);
 
-#include "LaunderSharmaKE.H"
-makeRASModel(LaunderSharmaKE);
-
 #include "kOmega.H"
 makeRASModel(kOmega);
 

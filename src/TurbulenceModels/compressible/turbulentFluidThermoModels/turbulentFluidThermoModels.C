@@ -71,9 +71,6 @@ makeRASModel(realizableKE);
 #include "buoyantKEpsilon.H"
 makeRASModel(buoyantKEpsilon);
 
-#include "LaunderSharmaKE.H"
-makeRASModel(LaunderSharmaKE);
-
 #include "kOmega.H"
 makeRASModel(kOmega);
 
